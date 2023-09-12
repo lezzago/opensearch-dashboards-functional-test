@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-const { ALERTING_API, ADMIN_AUTH, BASE_PATH } = require('../../constants');
+import { ALERTING_API, BASE_PATH } from '../../constants';
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -31,51 +31,12 @@ const { ALERTING_API, ADMIN_AUTH, BASE_PATH } = require('../../constants');
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
-  // Add the basic auth header when security enabled in the Opensearch cluster
-  // https://github.com/cypress-io/cypress/issues/1288
-  if (Cypress.env('security_enabled')) {
-    if (options) {
-      options.auth = ADMIN_AUTH;
-    } else {
-      options = { auth: ADMIN_AUTH };
-    }
-    // Add query parameters - select the default OpenSearch Dashboards tenant
-    options.qs = { security_tenant: 'private' };
-    return originalFn(url, options);
-  } else {
-    return originalFn(url, options);
-  }
-});
-
-// Be able to add default options to cy.request(), https://github.com/cypress-io/cypress/issues/726
-Cypress.Commands.overwrite('request', (originalFn, ...args) => {
-  let defaults = {};
-  // Add the basic authentication header when security enabled in the Opensearch cluster
-  if (Cypress.env('security_enabled')) {
-    defaults.auth = ADMIN_AUTH;
-  }
-
-  let options = {};
-  if (typeof args[0] === 'object' && args[0] !== null) {
-    options = Object.assign({}, args[0]);
-  } else if (args.length === 1) {
-    [options.url] = args;
-  } else if (args.length === 2) {
-    [options.method, options.url] = args;
-  } else if (args.length === 3) {
-    [options.method, options.url, options.body] = args;
-  }
-
-  return originalFn(Object.assign({}, defaults, options));
-});
-
 Cypress.Commands.add('createMonitor', (monitorJSON) => {
   cy.request(
     'POST',
     `${Cypress.env('openSearchUrl')}${ALERTING_API.MONITOR_BASE}`,
     monitorJSON
-  );
+  ).then(({ body }) => body);
 });
 
 Cypress.Commands.add('createAndExecuteMonitor', (monitorJSON) => {
@@ -89,7 +50,7 @@ Cypress.Commands.add('createAndExecuteMonitor', (monitorJSON) => {
       `${Cypress.env('openSearchUrl')}${ALERTING_API.MONITOR_BASE}/${
         response.body._id
       }/_execute`
-    );
+    ).then(({ body }) => body);
   });
 });
 
@@ -99,7 +60,7 @@ Cypress.Commands.add('executeMonitor', (monitorID) => {
     `${Cypress.env('openSearchUrl')}${
       ALERTING_API.MONITOR_BASE
     }/${monitorID}/_execute`
-  );
+  ).then(({ body }) => body);
 });
 
 Cypress.Commands.add('executeCompositeMonitor', (monitorID) => {
@@ -108,7 +69,7 @@ Cypress.Commands.add('executeCompositeMonitor', (monitorID) => {
     `${Cypress.env('openSearchUrl')}${
       ALERTING_API.WORKFLOW_BASE
     }/${monitorID}/_execute`
-  );
+  ).then(({ body }) => body);
 });
 
 Cypress.Commands.add('deleteAllAlerts', () => {
@@ -123,7 +84,7 @@ Cypress.Commands.add('deleteAllAlerts', () => {
       },
     },
     failOnStatusCode: false,
-  });
+  }).then(({ body }) => body);
 });
 
 Cypress.Commands.add('deleteMonitorByName', (monitorName) => {
@@ -139,7 +100,7 @@ Cypress.Commands.add('deleteMonitorByName', (monitorName) => {
   };
   cy.request(
     'GET',
-    `${Cypress.env('opensearch')}${ALERTING_API.MONITOR_BASE}/_search`,
+    `${Cypress.env('openSearchUrl')}${ALERTING_API.MONITOR_BASE}/_search`,
     body
   ).then((response) => {
     cy.request(
@@ -147,7 +108,7 @@ Cypress.Commands.add('deleteMonitorByName', (monitorName) => {
       `${Cypress.env('openSearchUrl')}${ALERTING_API.MONITOR_BASE}/${
         response.body.hits.hits[0]._id
       }`
-    );
+    ).then(({ body }) => body);
   });
 });
 
@@ -178,7 +139,7 @@ Cypress.Commands.add('deleteAllMonitors', () => {
                 : ALERTING_API.MONITOR_BASE
             }/${monitors[i]._id}`,
             failOnStatusCode: false,
-          });
+          }).then(({ body }) => body);
         }
       }
     } else {
@@ -187,8 +148,10 @@ Cypress.Commands.add('deleteAllMonitors', () => {
   });
 });
 
-Cypress.Commands.add('createIndexByName', (indexName, body = {}) => {
-  cy.request('PUT', `${Cypress.env('openSearchUrl')}/${indexName}`, body);
+Cypress.Commands.add('createIndexByName', (indexName) => {
+  cy.request('PUT', `${Cypress.env('openSearchUrl')}/${indexName}`).then(
+    ({ body }) => body
+  );
 });
 
 Cypress.Commands.add('deleteIndexByName', (indexName) => {
@@ -196,17 +159,17 @@ Cypress.Commands.add('deleteIndexByName', (indexName) => {
     method: 'DELETE',
     url: `${Cypress.env('openSearchUrl')}/${indexName}`,
     failOnStatusCode: false,
-  });
+  }).then(({ body }) => body);
 });
 
 Cypress.Commands.add(
   'insertDocumentToIndex',
   (indexName, documentId, documentBody) => {
     cy.request(
-      'PUT',
+      'POST',
       `${Cypress.env('openSearchUrl')}/${indexName}/_doc/${documentId}`,
       documentBody
-    );
+    ).then(({ body }) => body);
   }
 );
 
@@ -215,13 +178,5 @@ Cypress.Commands.add('loadSampleEcommerceData', () => {
     method: 'POST',
     headers: { 'osd-xsrf': 'opensearch-dashboards' },
     url: `${BASE_PATH}/api/sample_data/ecommerce`,
-  });
-});
-
-Cypress.Commands.add('loadSampleFlightsData', () => {
-  cy.request({
-    method: 'POST',
-    headers: { 'osd-xsrf': 'opensearch-dashboards' },
-    url: `${BASE_PATH}/api/sample_data/flights`,
-  });
+  }).then(({ body }) => body);
 });

@@ -4,8 +4,8 @@
  */
 
 import {
+  ALERTING_INDEX,
   ALERTING_PLUGIN_NAME,
-  INDEX,
 } from '../../../utils/plugins/alerting-dashboards-plugin/constants';
 import sampleAlertsFlyoutBucketMonitor from '../../../fixtures/plugins/alerting-dashboards-plugin/sample_alerts_flyout_bucket_level_monitor.json';
 import sampleAlertsFlyoutQueryMonitor from '../../../fixtures/plugins/alerting-dashboards-plugin/sample_alerts_flyout_query_level_monitor.json';
@@ -20,7 +20,7 @@ const TWENTY_SECONDS = 20000;
 
 describe('AcknowledgeAlertsModal', () => {
   before(() => {
-    // Delete any existing monitors
+    // Delete any existing monitors/alerts
     cy.deleteAllAlerts();
     cy.deleteAllMonitors();
 
@@ -219,6 +219,6 @@ describe('AcknowledgeAlertsModal', () => {
     cy.deleteAllMonitors();
 
     // Delete sample data
-    cy.deleteIndexByName(`${INDEX.SAMPLE_DATA_ECOMMERCE}`);
+    cy.deleteIndexByName(`${ALERTING_INDEX.SAMPLE_DATA_ECOMMERCE}`);
   });
 });
