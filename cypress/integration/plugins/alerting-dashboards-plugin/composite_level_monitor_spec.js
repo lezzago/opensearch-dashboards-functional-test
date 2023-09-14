@@ -135,6 +135,7 @@ describe('CompositeLevelMonitor', () => {
             cy.visit(
               `${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/monitors/${createdMonitor._id}?action=update-monitor&type=workflow`
             );
+            cy.contains('Update', { timeout: 60000 });
           } else {
             cy.log(
               'Failed to get created monitor ',
@@ -148,8 +149,6 @@ describe('CompositeLevelMonitor', () => {
           cy.log('Failed to get all monitors.', response);
         }
       });
-
-      cy.wait(60000);
     });
 
     it('by visual editor', () => {
