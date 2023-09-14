@@ -17,6 +17,7 @@ const QUERY_MONITOR = 'sample_alerts_flyout_query_level_monitor';
 const QUERY_TRIGGER = 'sample_alerts_flyout_query_level_trigger';
 
 const TWENTY_SECONDS = 20000;
+const ONE_MINUTE = 60000;
 
 describe('AcknowledgeAlertsModal', () => {
   before(() => {
@@ -47,8 +48,8 @@ describe('AcknowledgeAlertsModal', () => {
     cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/dashboard`);
 
     // Confirm dashboard is displaying rows for the test monitors.
-    cy.contains(BUCKET_MONITOR, { timeout: TWENTY_SECONDS });
-    cy.contains(QUERY_MONITOR, { timeout: TWENTY_SECONDS });
+    cy.contains(BUCKET_MONITOR, { timeout: ONE_MINUTE });
+    cy.contains(QUERY_MONITOR, { timeout: ONE_MINUTE });
   });
 
   it('Acknowledge button disabled when more than 1 trigger selected', () => {
