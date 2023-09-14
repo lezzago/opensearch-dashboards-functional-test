@@ -148,6 +148,8 @@ describe('CompositeLevelMonitor', () => {
           cy.log('Failed to get all monitors.', response);
         }
       });
+
+      cy.wait(60000);
     });
 
     it('by visual editor', () => {

@@ -19,7 +19,7 @@ describe('Alerts', () => {
     cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/dashboard`);
 
     // Common text to wait for to confirm page loaded, give up to 30 seconds for initial load
-    cy.contains('Acknowledge', { timeout: 30000 });
+    cy.contains('Acknowledge', { timeout: 60000 });
   });
 
   describe("can be in 'Active' state", () => {

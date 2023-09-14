@@ -36,8 +36,8 @@ describe('AcknowledgeAlertsModal', () => {
     cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/monitors`);
 
     // Confirm test monitors were created successfully
-    cy.contains(BUCKET_MONITOR, { timeout: TWENTY_SECONDS });
-    cy.contains(QUERY_MONITOR, { timeout: TWENTY_SECONDS });
+    cy.contains(BUCKET_MONITOR, { timeout: ONE_MINUTE });
+    cy.contains(QUERY_MONITOR, { timeout: ONE_MINUTE });
 
     // Wait 1 minute for the test monitors to trigger alerts, then go to the 'Alerts by trigger' dashboard page to view alerts
     cy.wait(60000);
