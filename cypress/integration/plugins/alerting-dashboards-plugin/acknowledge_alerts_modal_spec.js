@@ -17,10 +17,12 @@ const QUERY_MONITOR = 'sample_alerts_flyout_query_level_monitor';
 const QUERY_TRIGGER = 'sample_alerts_flyout_query_level_trigger';
 
 const TWENTY_SECONDS = 20000;
+const ONE_MINUTE = 60000;
 
 describe('AcknowledgeAlertsModal', () => {
   before(() => {
-    // Delete any existing monitors
+    // Delete any existing monitors/alerts
+    cy.deleteAllAlerts();
     cy.deleteAllMonitors();
 
     // Load sample data
@@ -34,11 +36,11 @@ describe('AcknowledgeAlertsModal', () => {
     cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/monitors`);
 
     // Confirm test monitors were created successfully
-    cy.contains(BUCKET_MONITOR, { timeout: TWENTY_SECONDS });
-    cy.contains(QUERY_MONITOR, { timeout: TWENTY_SECONDS });
+    cy.contains(BUCKET_MONITOR, { timeout: ONE_MINUTE });
+    cy.contains(QUERY_MONITOR, { timeout: ONE_MINUTE });
 
     // Wait 1 minute for the test monitors to trigger alerts, then go to the 'Alerts by trigger' dashboard page to view alerts
-    cy.wait(60000);
+    cy.wait(ONE_MINUTE);
   });
 
   beforeEach(() => {
@@ -46,8 +48,8 @@ describe('AcknowledgeAlertsModal', () => {
     cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/dashboard`);
 
     // Confirm dashboard is displaying rows for the test monitors.
-    cy.contains(BUCKET_MONITOR, { timeout: TWENTY_SECONDS });
-    cy.contains(QUERY_MONITOR, { timeout: TWENTY_SECONDS });
+    cy.contains(BUCKET_MONITOR, { timeout: ONE_MINUTE });
+    cy.contains(QUERY_MONITOR, { timeout: ONE_MINUTE });
   });
 
   it('Acknowledge button disabled when more than 1 trigger selected', () => {
