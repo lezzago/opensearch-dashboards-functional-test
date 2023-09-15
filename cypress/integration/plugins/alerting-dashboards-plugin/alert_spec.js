@@ -31,15 +31,19 @@ describe('Alerts', () => {
       sampleQueryLevelMonitorWithAlwaysTrueTrigger.name += `-${Cypress.config(
         'unique_number'
       )}`;
-      cy.createMonitor(sampleQueryLevelMonitorWithAlwaysTrueTrigger);
+      cy.createAndExecuteMonitor(sampleQueryLevelMonitorWithAlwaysTrueTrigger);
     });
 
     it('after the monitor starts running', () => {
       // Wait for 1 minute
-      cy.wait(60000);
+      // cy.wait(60000);
+
+      cy.intercept('api/alerting/alerts?*').as('getAlerts');
 
       // Reload the page
       cy.reload();
+
+      cy.wait('@getAlerts');
 
       // Type in monitor name in search box to filter out the alert
       cy.get(`input[type="search"]`)
@@ -118,11 +122,17 @@ describe('Alerts', () => {
       // Insert a document
       cy.insertDocumentToIndex('test', 1, {});
 
+      cy.executeMonitorByName(`${Cypress.config('unique_number')}`);
+
       // Wait for 1 minute
-      cy.wait(60000);
+      // cy.wait(60000);
+
+      cy.intercept('api/alerting/alerts?*').as('getAlerts');
 
       // Reload the page
       cy.reload();
+
+      cy.wait('@getAlerts');
 
       // Type in monitor name in search box to filter out the alert
       cy.get(`input[type="search"]`)
