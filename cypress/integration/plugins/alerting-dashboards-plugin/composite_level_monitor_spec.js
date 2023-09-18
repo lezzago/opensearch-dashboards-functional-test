@@ -15,6 +15,8 @@ const sample_index_1 = 'sample_index_1';
 const sample_index_2 = 'sample_index_2';
 const SAMPLE_VISUAL_EDITOR_MONITOR =
   'sample_visual_editor_composite_level_monitor';
+const ONE_MINUTE = 60000;
+const FIVE_MINUTES = 300000;
 
 const clearAll = () => {
   cy.deleteIndexByName(sample_index_1);
@@ -42,6 +44,23 @@ describe('CompositeLevelMonitor', () => {
     cy.createMonitor(sampleCompositeJson.sample_composite_associated_monitor_1);
     cy.createMonitor(sampleCompositeJson.sample_composite_associated_monitor_2);
     cy.createMonitor(sampleCompositeJson.sample_composite_associated_monitor_3);
+
+    // Visit Alerting OpenSearch Dashboards
+    cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/monitors`);
+
+    // Confirm test monitors were created successfully
+    cy.contains(
+      sampleCompositeJson.sample_composite_associated_monitor_1.name,
+      { timeout: FIVE_MINUTES }
+    );
+    cy.contains(
+      sampleCompositeJson.sample_composite_associated_monitor_2.name,
+      { timeout: FIVE_MINUTES }
+    );
+    cy.contains(
+      sampleCompositeJson.sample_composite_associated_monitor_3.name,
+      { timeout: FIVE_MINUTES }
+    );
   });
 
   beforeEach(() => {
@@ -55,7 +74,7 @@ describe('CompositeLevelMonitor', () => {
       cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/monitors`);
 
       // Common text to wait for to confirm page loaded, give up to 20 seconds for initial load
-      cy.contains('Create monitor', { timeout: 60000 });
+      cy.contains('Create monitor', { timeout: ONE_MINUTE });
 
       // Go to create monitor page
       cy.contains('Create monitor').click({ force: true });
@@ -135,7 +154,7 @@ describe('CompositeLevelMonitor', () => {
             cy.visit(
               `${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/monitors/${createdMonitor._id}?action=update-monitor&type=workflow`
             );
-            cy.contains('Update', { timeout: 60000 });
+            cy.contains('Update', { timeout: ONE_MINUTE });
           } else {
             cy.log(
               'Failed to get created monitor ',
