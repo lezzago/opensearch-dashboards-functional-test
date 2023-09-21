@@ -33,8 +33,11 @@ describe('AcknowledgeAlertsModal', () => {
     cy.createMonitor(sampleAlertsFlyoutBucketMonitor);
     cy.createMonitor(sampleAlertsFlyoutQueryMonitor);
 
+    cy.intercept('api/alerting/monitors?*').as('searchMonitorsRequest');
     // Visit Alerting OpenSearch Dashboards
     cy.visit(`${BASE_PATH}/app/${ALERTING_PLUGIN_NAME}#/monitors`);
+
+    cy.wait('@searchMonitorsRequest');
 
     // Confirm test monitors were created successfully
     cy.contains(BUCKET_MONITOR, { timeout: FIVE_MINUTES });
